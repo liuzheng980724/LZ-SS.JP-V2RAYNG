@@ -10,7 +10,9 @@
     <string name="migration_fail">Data migration failed!</string>
 
     <!-- New -->
-    <string name="lzss_login_title" translatable="false">LZ-SS.JP Login</string>
+    <string name="lzss_login_title" translatable="false">Get My LZSS Subscription List</string>
+    <string name="lzss_homepage" translatable="false">Manage My LZSS Account</string>
+    <string name="lzss_login_error" translatable="false">Login Error!! Try again later</string>
 
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">Stop</string>

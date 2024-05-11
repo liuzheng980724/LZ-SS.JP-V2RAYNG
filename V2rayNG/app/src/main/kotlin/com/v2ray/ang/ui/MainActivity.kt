@@ -20,7 +20,6 @@ import androidx.core.view.GravityCompat
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.recyclerview.widget.ItemTouchHelper
 import android.util.Log
-import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -45,6 +44,15 @@ import java.io.File
 import java.io.FileOutputStream
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
+    private val lzssLoginLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (lzssLogin.RESULT_OK == 1) {
+            importConfigViaSub()
+        } else {
+            toast(getString(R.string.lzss_login_error))
+        }
+
+    }
+
     private lateinit var binding: ActivityMainBinding
 
     private val adapter by lazy { MainRecyclerAdapter(this) }
@@ -55,6 +63,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             startV2Ray()
         }
     }
+
     private var mItemTouchHelper: ItemTouchHelper? = null
     val mainViewModel: MainViewModel by viewModels()
 
@@ -259,6 +268,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 //            startActivity<SubSettingActivity>()
 //            true
 //        }
+
+        R.id.quick_sub_button -> {
+            importConfigViaSub()
+            true
+        }
 
         R.id.sub_update -> {
             importConfigViaSub()
@@ -630,12 +644,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     fun lzssLogin() {
-        startActivity(
-            Intent()
-                .setClass(this, lzssLogin::class.java)
-        )
+        val intent = Intent().setClass(this, lzssLogin::class.java)
+        lzssLoginLauncher.launch(intent)
     }
-
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
@@ -655,6 +666,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 //Utils.openUri(this, "https://lz-ss.jp")
                 lzssLogin()
             }
+            R.id.lzss_homepage -> {
+                Utils.openUri(this, "https://lz-ss.jp")
+            }
 
             R.id.logcat -> {
                 startActivity(Intent(this, LogcatActivity::class.java))
@@ -663,4 +677,5 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
+
 }

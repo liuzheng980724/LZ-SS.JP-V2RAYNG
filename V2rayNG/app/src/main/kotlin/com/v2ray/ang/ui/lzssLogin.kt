@@ -4,20 +4,27 @@ import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.util.MyContextWrapper
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.BufferedOutputStream
 import java.io.BufferedReader
@@ -25,18 +32,15 @@ import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
 
-
 class lzssLogin : AppCompatActivity() {
-
     lateinit var usernameInput: EditText
     lateinit var passwordInput: EditText
     lateinit var loginStatus: TextView
 
-    private val subStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SUB, MMKV.MULTI_PROCESS_MODE) }
-    private val editSubId by lazy { intent.getStringExtra("subId").orEmpty() }
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        RESULT_OK = 0
+        println(RESULT_OK)
+        super.onCreate(null)
         setContentView(R.layout.activity_lzss_login)
 
         usernameInput = findViewById(R.id.userInput_email)
@@ -46,9 +50,6 @@ class lzssLogin : AppCompatActivity() {
 
     }
 
-    fun postRequest() {
-
-    }
 
     fun checkUser(view: View?) {
         var userEmail = usernameInput.text
@@ -161,11 +162,13 @@ class lzssLogin : AppCompatActivity() {
                     println("$jsonResponse")
                     loginStatus.setText("$subscribeUrl")
 
-                    saveServer(subscribeUrl)
-                    loginStatus.setText("Updating subscription...")
-                    MainActivity().importConfigViaSub()
+                    deleteAll()
 
-
+                    importUrlAsSubscription(subscribeUrl)
+                    loginStatus.setText("Done!")
+                    RESULT_OK = 1
+                    println(RESULT_OK)
+                    finish()
 
                 } else {
                     // Handle error response
@@ -179,36 +182,17 @@ class lzssLogin : AppCompatActivity() {
         }.start()
     }
 
-    private fun saveServer(subLink: String): Boolean {
-        val subItem: SubscriptionItem
-        val json = subStorage?.decodeString(editSubId)
-        var subId = editSubId
-        if (!json.isNullOrBlank()) {
-            subItem = Gson().fromJson(json, SubscriptionItem::class.java)
-        } else {
-            subId = Utils.getUuid()
-            subItem = SubscriptionItem()
-        }
-
-        subItem.remarks = "LZ-SS.JP"
-        subItem.url = subLink
-        subItem.enabled = true
-
-        if (TextUtils.isEmpty(subItem.remarks)) {
-            toast(R.string.sub_setting_remarks)
-            return false
-        }
-//        if (TextUtils.isEmpty(subItem.url)) {
-//            toast(R.string.sub_setting_url)
-//            return false
-//        }
-
-        subStorage?.encode(subId, Gson().toJson(subItem))
-        toast(R.string.toast_success)
-        finish()
-        return true
+    private fun importUrlAsSubscription(mySub: String) {
+        MmkvManager.importUrlAsSubscriptionLZSS(mySub)
     }
 
+    private fun deleteAll() {
+        MmkvManager.removeAllSubscription()
+        MmkvManager.removeAllServer()
+    }
 
+    companion object {
+        var RESULT_OK = 0
+    }
 
 }

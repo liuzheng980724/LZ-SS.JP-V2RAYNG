@@ -10,6 +10,10 @@
             android:icon="@android:drawable/ic_popup_sync"
             android:title="@string/lzss_login_title" />
         <item
+            android:id="@+id/lzss_homepage"
+            android:icon="@drawable/ic_logcat_white_24dp"
+            android:title="@string/lzss_homepage" />
+        <item
             android:id="@+id/sub_setting"
             android:icon="@drawable/ic_subscriptions_white_24dp"
             android:title="@string/title_sub_setting" />
@@ -23,7 +27,9 @@
                 android:title="@string/title_user_asset_setting" />
     </group>
 
-    <group android:id="@+id/group_id2">
+    <group
+        android:id="@+id/group_id2"
+        android:visible="false">
         <item
             android:id="@+id/logcat"
             android:icon="@drawable/ic_logcat_white_24dp"

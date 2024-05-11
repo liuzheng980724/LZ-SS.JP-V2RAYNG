@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/quick_sub_button"
+        android:icon="@android:drawable/stat_notify_sync"
+        android:title="@string/title_sub_update"
+        app:showAsAction="ifRoom" />
+    <item
         android:icon="@drawable/ic_add_white_24dp"
         android:title="@string/menu_item_add_config"
         app:showAsAction="ifRoom">
@@ -98,5 +103,6 @@
     <item
         android:id="@+id/sub_update"
         android:title="@string/title_sub_update"
+        android:visible="false"
         app:showAsAction="never" />
 </menu>

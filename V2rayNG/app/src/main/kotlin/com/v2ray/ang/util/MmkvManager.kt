@@ -125,6 +125,20 @@ object MmkvManager {
         return 1
     }
 
+    fun importUrlAsSubscriptionLZSS(url: String): Int {
+        val subscriptions = decodeSubscriptions()
+        subscriptions.forEach {
+            if (it.second.url == url) {
+                return 0
+            }
+        }
+        val subItem = SubscriptionItem()
+        subItem.remarks = "LZ-SS.JP"
+        subItem.url = url
+        subStorage?.encode(Utils.getUuid(), Gson().toJson(subItem))
+        return 1
+    }
+
     fun decodeSubscriptions(): List<Pair<String, SubscriptionItem>> {
         val subscriptions = mutableListOf<Pair<String, SubscriptionItem>>()
         subStorage?.allKeys()?.forEach { key ->
@@ -140,6 +154,10 @@ object MmkvManager {
     fun removeSubscription(subid: String) {
         subStorage?.remove(subid)
         removeServerViaSubid(subid)
+    }
+
+    fun removeAllSubscription() {
+        subStorage?.clearAll()
     }
 
     fun removeAllServer() {
